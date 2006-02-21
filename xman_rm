@@ -21,3 +21,83 @@
 #
 # The GNU General Public License is contained in the file COPYING.
 #
+
+#!/bin/bash
+
+# Author: xman
+# Email : cshinyee@gmail.com
+# Date  : 18 Feb 2006
+
+# Syntax: xman_rm FILE ...
+
+# Given: A list of files/directories.
+# Output: The list of files/directories are appended with date/time, and moved to "$DIR_DELETED" directory in their current directories. An index is created in "$RECYCLE_BIN/$DFILE_LIST" for each files/directories.
+
+# Known problems/limitations:
+# 1. Deleting a mount point will move the files into parent folder, which is resided in another filesystem. 
+# 2. If the filename appended with date/time exists in $DIR_DELETED, we will skip the deletion. 
+
+LS="/bin/ls"
+MV="/bin/mv"
+RM="/bin/rm"
+MKDIR="/bin/mkdir"
+DATE="/bin/date"
+
+RECYCLE_BIN="$HOME/.recycle_bin"
+DIR_DELETED=".deleted"
+DFILE_LIST="deleted_file.txt"
+
+TIMEFORMAT="+%Y.%m%d.%H%S.%N"
+
+#########################################################################################
+
+if [ -z "$1" ] ; then
+	echo "usage: xman_rm FILE ..."
+	exit 0
+fi
+
+# "Delete" each file in a loop.
+until [ -z "$1" ]
+do
+	# File to be deleted.
+	f=$1
+
+	if [ ! -e $f ] ; then
+		echo "Cannot find: $f"
+		shift
+		continue
+	fi
+
+	d=`dirname $f`
+	b=`basename $f`
+	if [ "$d" == "$b" ] ; then
+		# Our deletion algorithm moves deleting files into parent's folder. 
+		# Thus, files to be deleted must have parent folders.
+		echo "Cannot delete file with no parent directory: $f"
+		shift 
+		continue
+	fi
+
+	echo "Deleting: $f"
+	$MKDIR -p $d/$DIR_DELETED
+	ext=`$DATE $TIMEFORMAT`
+	dfname="$b.$ext"
+	if [ ! -e $d/$DIR_DELETED/$dfname ] ; then
+		$MV $f $d/$DIR_DELETED/$dfname
+	else	
+		echo "$dfname exists in recycle bin. Skip deletion."
+		shift
+		continue
+	fi
+
+	# Mark the deletion in repository.
+	$MKDIR -p $RECYCLE_BIN
+	echo "DEL $d/$b $d/$DIR_DELETED/$dfname" >> $RECYCLE_BIN/$DFILE_LIST
+
+	shift
+done
+
+exit 0
+
+#eof
+
