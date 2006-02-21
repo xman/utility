@@ -69,6 +69,12 @@ do
 	fi
 
 	d=`dirname $f`
+	# $d doesnt start with "/"? 
+	if [ ${d:0:1} != "/" ] ; then
+		# $d is a relative path.
+		# Prepend $d with current directory to obtain the absolute path.
+		d=$PWD/$d
+	fi
 	b=`basename $f`
 	if [ "$d" == "$b" ] ; then
 		# Our deletion algorithm moves deleting files into parent's folder. 
