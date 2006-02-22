@@ -21,3 +21,65 @@
 #
 # The GNU General Public License is contained in the file COPYING.
 #
+
+#!/bin/bash
+
+# Author: xman
+# Email : cshinyee@gmail.com
+# Date  : 22 Feb 2006
+
+# Syntax: xman_list_rb
+
+# Description: List the deleted files in recycle bin.
+
+# Given: 
+# Output: A list of deleted files in recycle bin.
+
+# Known problems/limitations:
+
+LS="/bin/ls"
+MV="/bin/mv"
+RM="/bin/rm"
+MKDIR="/bin/mkdir"
+DATE="/bin/date"
+
+RECYCLE_BIN="$HOME/.recycle_bin"
+DIR_DELETED=".deleted"
+DFILE_LIST="deleted_file.txt"
+
+TIMEFORMAT="+%Y.%m%d.%H%S.%N"
+
+COMMAND_DEL="DEL"
+
+#########################################################################################
+
+if [ ! -e "$RECYCLE_BIN/$DFILE_LIST" ] ; then
+	echo "Nothing to list."
+	exit 0 
+fi 
+
+echo "Listing deleted files in recycle bin."
+
+let count=0
+exec < $RECYCLE_BIN/$DFILE_LIST
+while read instr orig_fname del_fname
+do
+	
+	# echo "$instr $orig_fname $del_fname" 
+	if [ "$instr" == "$COMMAND_DEL" ] ; then
+		if [ -e "$del_fname" ] ; then
+			let count=count+1
+			echo "$count: $del_fname"
+		else
+			echo "$del_fname no longer exists"
+		fi
+	fi
+done
+exec <&-
+
+echo "Listing completed."
+
+exit 0
+
+#eof
+

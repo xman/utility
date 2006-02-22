@@ -21,3 +21,82 @@
 #
 # The GNU General Public License is contained in the file COPYING.
 #
+
+#!/bin/bash
+
+# Author: xman
+# Email : cshinyee@gmail.com
+# Date  : 22 Feb 2006
+
+# Syntax: xman_create_pdfdb <PATH>
+
+# Description: Create a PDF database.
+
+# Given: A starting path.
+# Output: A PDF database.
+
+# Known problems/limitations:
+
+LS="/bin/ls"
+MV="/bin/mv"
+RM="/bin/rm"
+MKDIR="/bin/mkdir"
+DATE="/bin/date"
+
+PDFDB_DIR=$HOME/.pdfdb
+
+TIMEFORMAT="+%Y.%m%d.%H%S.%N"
+
+#########################################################################################
+
+explore()
+{
+	local file=""
+	for file in `ls` 
+	do
+		if [ -d $file ] ; then
+			echo "Entering $file"
+			pushd $file > /dev/null
+			explore
+			echo "Leaving $file"
+			popd > /dev/null
+		elif [ ${file##*.} == "pdf" ] ; then
+			csum=`sha1sum $PWD/$file | gawk '{ print $1 }'`
+			if [ -e $PDFDB_DIR/$csum ] ; then
+				echo "WARNING: $file exists in database."
+			else
+				echo "Processing: $file"
+				mkdir -p $PDFDB_DIR/$csum
+				# echo "pdftotext $file $PDFDB_DIR/$csum/${file%.*}"
+				pdftotext $file $PDFDB_DIR/$csum/${file%.*} > /dev/null
+				# pdfimages -j $file $PDFDB_DIR/$csum/image
+			fi
+		fi
+	done
+}
+
+if [ -z "$1" ] ; then
+	echo "usage: xman_create_pdfdb <PATH>"
+	exit 0
+fi
+
+dir=$1
+
+if [ ! -e "$dir" ] ; then
+	echo "ERROR: Path $dir does not exist"
+	exit 0
+fi
+
+if [ ! -d "$dir" ] ; then
+	echo "ERROR: $dir is not a directory"
+	exit 0
+fi
+
+pushd $dir > /dev/null
+explore
+popd > /dev/null
+
+exit 0
+
+#eof
+

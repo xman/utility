@@ -21,3 +21,71 @@
 #
 # The GNU General Public License is contained in the file COPYING.
 #
+
+#!/bin/bash
+
+# Author: xman
+# Email : cshinyee@gmail.com
+# Date  : 22 Feb 2006
+
+# Syntax: xman_clean_rb
+
+# Description: Clean recycle bin.
+
+# Given: 
+# Output: Removes all the files in the recycle bin.
+
+# Known problems/limitations:
+# 1. Currently we simply discard the "DFILE_LIST" after cleaning. Operations other than "DEL" are ignored.
+# 2. We do not ensure atomic cleaning and deleting. We should have locking implemented.
+
+LS="/bin/ls"
+MV="/bin/mv"
+RM="/bin/rm"
+MKDIR="/bin/mkdir"
+DATE="/bin/date"
+
+RECYCLE_BIN="$HOME/.recycle_bin"
+DIR_DELETED=".deleted"
+DFILE_LIST="deleted_file.txt"
+
+TIMEFORMAT="+%Y.%m%d.%H%S.%N"
+
+COMMAND_DEL="DEL"
+
+let list_only=0
+
+#########################################################################################
+
+if [ ! -e "$RECYCLE_BIN/$DFILE_LIST" ] ; then
+	echo "Nothing to clean."
+	exit 0 
+fi 
+
+echo "Cleaning recycle bin."
+
+let count=0
+exec < $RECYCLE_BIN/$DFILE_LIST
+while read instr orig_fname del_fname
+do
+	
+	# echo "$instr $orig_fname $del_fname" 
+	if [ "$instr" == "$COMMAND_DEL" ] ; then
+		if [ -e "$del_fname" ] ; then
+			echo "Cleaning: $del_fname"
+			$RM -rf $del_fname
+			let count=count+1
+		else
+			echo "$del_fname no longer exists"
+		fi
+	fi
+done
+exec <&-
+$RM $RECYCLE_BIN/$DFILE_LIST
+
+echo "Removed $count item(s). Cleaning completed."
+
+exit 0
+
+#eof
+
