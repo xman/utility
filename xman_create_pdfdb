@@ -68,7 +68,7 @@ explore()
 				echo "Processing: $file"
 				mkdir -p $PDFDB_DIR/$csum
 				# echo "pdftotext $file $PDFDB_DIR/$csum/${file%.*}"
-				pdftotext $file $PDFDB_DIR/$csum/${file%.*} > /dev/null
+				pdftotext $file $PDFDB_DIR/$csum/${file%.*}.txt > /dev/null
 				# pdfimages -j $file $PDFDB_DIR/$csum/image
 			fi
 		fi
