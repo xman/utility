@@ -41,6 +41,8 @@
 AWK="gawk"
 DIFF="diff --brief"
 SHA1SUM="sha1sum"
+PDFTOTEXT="pdftotext"
+PDFIMAGES="pdfimages -j"
 
 PDFDB_DIR=$HOME/.pdfdb
 TMP_DIR_PREFIX=/tmp/createpdfdb
@@ -77,11 +79,11 @@ explore()
 			else
 				echo "Processing: $file"
 				mkdir -p $PDFDB_DIR/$csum
-				# echo "pdftotext $file $PDFDB_DIR/$csum/${file%.*}"
-				pdftotext $file $PDFDB_DIR/$csum/${file%.*}.txt > /dev/null
 				TMP_DIR=$TMP_DIR_PREFIX/$USER.$RANDOM
 				mkdir -p $TMP_DIR/$csum
-				pdfimages -j $file $TMP_DIR/$csum/image
+				$PDFTOTEXT $file $TMP_DIR/$csum/${file%.*}.txt > /dev/null
+				mv -f $TMP_DIR/$csum/${file%.*}.txt $PDFDB_DIR/$csum/
+				$PDFIMAGES $file $TMP_DIR/$csum/image
 				# Only retain images with at least minimum size.
 				# Use .tmp as temporary folder for renamed images.
 				mkdir -p $TMP_DIR/$csum/.tmp
