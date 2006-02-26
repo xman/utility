@@ -36,22 +36,32 @@
 # Output: A PDF database.
 
 # Known problems/limitations:
+# 1. $RANDOM might not be thread-safe. There might be a conflict in generating same RAND number. We should check whether the $TMP_DIR already exists.
 
-LS="/bin/ls"
-MV="/bin/mv"
-RM="/bin/rm"
-MKDIR="/bin/mkdir"
-DATE="/bin/date"
+AWK="gawk"
+DIFF="diff --brief"
+SHA1SUM="sha1sum"
 
 PDFDB_DIR=$HOME/.pdfdb
+TMP_DIR_PREFIX=/tmp/createpdfdb
 
 TIMEFORMAT="+%Y.%m%d.%H%S.%N"
+
+MIN_IMAGE_SIZE=1000
+IMAGE_NAME_PREFIX="image-"
 
 #########################################################################################
 
 explore()
 {
 	local file=""
+	local csum=""
+	local image=""
+	local image_size=0
+	local image_csum=""
+	local ext=""
+	local count=0
+	local TMP_DIR=""
 	for file in `ls` 
 	do
 		if [ -d $file ] ; then
@@ -61,7 +71,7 @@ explore()
 			echo "Leaving $file"
 			popd > /dev/null
 		elif [ ${file##*.} == "pdf" ] ; then
-			csum=`sha1sum $PWD/$file | gawk '{ print $1 }'`
+			csum=`$SHA1SUM $PWD/$file | $AWK '{ print $1 }'`
 			if [ -e $PDFDB_DIR/$csum ] ; then
 				echo "WARNING: $file exists in database."
 			else
@@ -69,7 +79,33 @@ explore()
 				mkdir -p $PDFDB_DIR/$csum
 				# echo "pdftotext $file $PDFDB_DIR/$csum/${file%.*}"
 				pdftotext $file $PDFDB_DIR/$csum/${file%.*}.txt > /dev/null
-				# pdfimages -j $file $PDFDB_DIR/$csum/image
+				TMP_DIR=$TMP_DIR_PREFIX/$USER.$RANDOM
+				mkdir -p $TMP_DIR/$csum
+				pdfimages -j $file $TMP_DIR/$csum/image
+				# Only retain images with at least minimum size.
+				# Use .tmp as temporary folder for renamed images.
+				mkdir -p $TMP_DIR/$csum/.tmp
+				for image in `ls $TMP_DIR/$csum`
+				do
+					image_size=`ls -l $TMP_DIR/$csum/$image \
+							| $AWK '{ print $5}'`
+					if [ "$image_size" -lt "$MIN_IMAGE_SIZE" ] ; then
+						rm -f $TMP_DIR/$csum/$image
+					else
+						image_csum=`$SHA1SUM $TMP_DIR/$csum/$image \
+								| $AWK '{print $1 }'`
+						ext=${image##*.}
+						mv -f $TMP_DIR/$csum/$image $TMP_DIR/$csum/.tmp/$image_csum.$ext
+					fi					
+				done
+				let count=1
+				for image in `ls $TMP_DIR/$csum/.tmp`
+				do
+					ext=${image##*.}
+					mv $TMP_DIR/$csum/.tmp/$image $PDFDB_DIR/$csum/$IMAGE_NAME_PREFIX$count.$ext
+					let count+=1
+				done
+				rm -rf $TMP_DIR
 			fi
 		fi
 	done
