@@ -81,9 +81,11 @@ explore()
 				mkdir -p $PDFDB_DIR/$csum
 				TMP_DIR=$TMP_DIR_PREFIX/$USER.$RANDOM
 				mkdir -p $TMP_DIR/$csum
-				$PDFTOTEXT $file $TMP_DIR/$csum/${file%.*}.txt > /dev/null
+				cp -f $file $TMP_DIR/$csum/
+				$PDFTOTEXT $TMP_DIR/$csum/$file $TMP_DIR/$csum/${file%.*}.txt > /dev/null
 				mv -f $TMP_DIR/$csum/${file%.*}.txt $PDFDB_DIR/$csum/
-				$PDFIMAGES $file $TMP_DIR/$csum/image
+				rm -f $TMP_DIR/$csum/$file
+				# $PDFIMAGES $file $TMP_DIR/$csum/image
 				# Only retain images with at least minimum size.
 				# Use .tmp as temporary folder for renamed images.
 				mkdir -p $TMP_DIR/$csum/.tmp
