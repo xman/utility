@@ -37,12 +37,6 @@
 
 # Known problems/limitations:
 
-LS="/bin/ls"
-MV="/bin/mv"
-RM="/bin/rm"
-MKDIR="/bin/mkdir"
-DATE="/bin/date"
-
 RECYCLE_BIN="$HOME/.recycle_bin"
 DIR_DELETED=".deleted"
 DFILE_LIST="deleted_file.txt"

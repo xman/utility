@@ -39,12 +39,6 @@
 # 1. Currently we simply discard the "DFILE_LIST" after cleaning. Operations other than "DEL" are ignored.
 # 2. We do not ensure atomic cleaning and deleting. We should have locking implemented.
 
-LS="/bin/ls"
-MV="/bin/mv"
-RM="/bin/rm"
-MKDIR="/bin/mkdir"
-DATE="/bin/date"
-
 RECYCLE_BIN="$HOME/.recycle_bin"
 DIR_DELETED=".deleted"
 DFILE_LIST="deleted_file.txt"
@@ -73,7 +67,7 @@ do
 	if [ "$instr" == "$COMMAND_DEL" ] ; then
 		if [ -e "$del_fname" ] ; then
 			echo "Cleaning: $del_fname"
-			$RM -rf $del_fname
+			rm -rf $del_fname
 			let count=count+1
 		else
 			echo "$del_fname no longer exists"
@@ -81,7 +75,7 @@ do
 	fi
 done
 exec <&-
-$RM $RECYCLE_BIN/$DFILE_LIST
+rm $RECYCLE_BIN/$DFILE_LIST
 
 echo "Removed $count item(s). Cleaning completed."
 
