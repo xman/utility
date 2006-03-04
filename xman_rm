@@ -43,6 +43,8 @@ DFILE_LIST="deleted_file.txt"
 
 TIMEFORMAT="+%Y.%m%d.%H%S.%N"
 
+newline=$'\n'
+
 #########################################################################################
 
 if [ -z "$1" ] ; then
@@ -54,22 +56,22 @@ fi
 until [ -z "$1" ]
 do
 	# File to be deleted.
-	f=$1
+	f="$1"
 
-	if [ ! -e $f ] ; then
+	if [ ! -e "$f" ] ; then
 		echo "Cannot find: $f"
 		shift
 		continue
 	fi
 
-	d=`dirname $f`
+	d=`dirname "$f"`
 	# $d doesnt start with "/"? 
-	if [ ${d:0:1} != "/" ] ; then
+	if [ "${d:0:1}" != "/" ] ; then
 		# $d is a relative path.
 		# Prepend $d with current directory to obtain the absolute path.
-		d=$PWD/$d
+		d="$PWD/$d"
 	fi
-	b=`basename $f`
+	b=`basename "$f"`
 	if [ "$d" == "$b" ] ; then
 		# Our deletion algorithm moves deleting files into parent's folder. 
 		# Thus, files to be deleted must have parent folders.
@@ -79,11 +81,11 @@ do
 	fi
 
 	echo "Deleting: $f"
-	mkdir -p $d/$DIR_DELETED
+	mkdir -p "$d/$DIR_DELETED"
 	ext=`date $TIMEFORMAT`
 	dfname="$b.$ext"
-	if [ ! -e $d/$DIR_DELETED/$dfname ] ; then
-		mv $f $d/$DIR_DELETED/$dfname
+	if [ ! -e "$d/$DIR_DELETED/$dfname" ] ; then
+		mv "$f" "$d/$DIR_DELETED/$dfname"
 	else	
 		echo "$dfname exists in recycle bin. Skip deletion."
 		shift
@@ -91,8 +93,8 @@ do
 	fi
 
 	# Mark the deletion in repository.
-	mkdir -p $RECYCLE_BIN
-	echo "DEL $d/$b $d/$DIR_DELETED/$dfname" >> $RECYCLE_BIN/$DFILE_LIST
+	mkdir -p "$RECYCLE_BIN"
+	echo "DEL$newline$d/$b$newline$d/$DIR_DELETED/$dfname" >> "$RECYCLE_BIN/$DFILE_LIST"
 
 	shift
 done

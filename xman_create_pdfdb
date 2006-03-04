@@ -44,8 +44,8 @@ SHA1SUM="sha1sum"
 PDFTOTEXT="pdftotext"
 PDFIMAGES="pdfimages -j"
 
-PDFDB_DIR=$HOME/.pdfdb
-TMP_DIR_PREFIX=/tmp/createpdfdb
+PDFDB_DIR="$HOME/.pdfdb"
+TMP_DIR_PREFIX="/tmp/createpdfdb"
 
 TIMEFORMAT="+%Y.%m%d.%H%S.%N"
 
@@ -64,53 +64,55 @@ explore()
 	local ext=""
 	local count=0
 	local TMP_DIR=""
-	for file in `ls` 
+	ls -1 | while read -r file 
 	do
-		if [ -d $file ] ; then
+		if [ -d "$file" ] ; then
 			echo "Entering $file"
-			pushd $file > /dev/null
+			pushd "$file" > /dev/null
 			explore
 			echo "Leaving $file"
 			popd > /dev/null
-		elif [ ${file##*.} == "pdf" ] ; then
-			csum=`$SHA1SUM $PWD/$file | $AWK '{ print $1 }'`
-			if [ -e $PDFDB_DIR/$csum ] ; then
+		elif [ "${file##*.}" == "pdf" ] ; then
+			csum=`$SHA1SUM "$PWD/$file" | $AWK '{ print $1 }'`
+			if [ -e "$PDFDB_DIR/$csum" ] ; then
 				echo "WARNING: $file exists in database."
 			else
 				echo "Processing: $file"
-				mkdir -p $PDFDB_DIR/$csum
-				TMP_DIR=$TMP_DIR_PREFIX/$USER.$RANDOM
-				mkdir -p $TMP_DIR/$csum
-				cp -f $file $TMP_DIR/$csum/
-				$PDFTOTEXT $TMP_DIR/$csum/$file $TMP_DIR/$csum/${file%.*}.txt > /dev/null
-				mv -f $TMP_DIR/$csum/${file%.*}.txt $PDFDB_DIR/$csum/
-				rm -f $TMP_DIR/$csum/$file
-				# $PDFIMAGES $file $TMP_DIR/$csum/image
+				mkdir -p "$PDFDB_DIR/$csum"
+				TMP_DIR="$TMP_DIR_PREFIX/$USER.$RANDOM"
+				mkdir -p "$TMP_DIR/$csum"
+				cp -f "$file" "$TMP_DIR/$csum/"
+				$PDFTOTEXT "$TMP_DIR/$csum/$file" "$TMP_DIR/$csum/${file%.*}.txt" > /dev/null
+				mv -f "$TMP_DIR/$csum/${file%.*}.txt" "$PDFDB_DIR/$csum/"
+				rm -f "$TMP_DIR/$csum/$file"
+				# $PDFIMAGES "$file" "$TMP_DIR/$csum/image"
 				# Only retain images with at least minimum size.
 				# Use .tmp as temporary folder for renamed images.
-				mkdir -p $TMP_DIR/$csum/.tmp
-				for image in `ls $TMP_DIR/$csum`
+				mkdir -p "$TMP_DIR/$csum/.tmp"
+				ls -1 "$TMP_DIR/$csum" | while read -r image
 				do
-					image_size=`ls -l $TMP_DIR/$csum/$image \
+					image_size=`ls -l "$TMP_DIR/$csum/$image" \
 							| $AWK '{ print $5}'`
 					if [ "$image_size" -lt "$MIN_IMAGE_SIZE" ] ; then
-						rm -f $TMP_DIR/$csum/$image
+						rm -f "$TMP_DIR/$csum/$image"
 					else
-						image_csum=`$SHA1SUM $TMP_DIR/$csum/$image \
+						image_csum=`$SHA1SUM "$TMP_DIR/$csum/$image" \
 								| $AWK '{print $1 }'`
-						ext=${image##*.}
-						mv -f $TMP_DIR/$csum/$image $TMP_DIR/$csum/.tmp/$image_csum.$ext
+						ext="${image##*.}"
+						mv -f "$TMP_DIR/$csum/$image" "$TMP_DIR/$csum/.tmp/$image_csum.$ext"
 					fi					
 				done
 				let count=1
-				for image in `ls $TMP_DIR/$csum/.tmp`
+				ls "$TMP_DIR/$csum/.tmp" | while read -r image
 				do
-					ext=${image##*.}
-					mv $TMP_DIR/$csum/.tmp/$image $PDFDB_DIR/$csum/$IMAGE_NAME_PREFIX$count.$ext
+					ext="${image##*.}"
+					mv "$TMP_DIR/$csum/.tmp/$image" "$PDFDB_DIR/$csum/$IMAGE_NAME_PREFIX$count.$ext"
 					let count+=1
 				done
-				rm -rf $TMP_DIR
+				rm -rf "$TMP_DIR"
 			fi
+		else
+			echo "Ignore: $file"
 		fi
 	done
 }
@@ -120,7 +122,7 @@ if [ -z "$1" ] ; then
 	exit 0
 fi
 
-dir=$1
+dir="$1"
 
 if [ ! -e "$dir" ] ; then
 	echo "ERROR: Path $dir does not exist"
@@ -132,7 +134,7 @@ if [ ! -d "$dir" ] ; then
 	exit 0
 fi
 
-pushd $dir > /dev/null
+pushd "$dir" > /dev/null
 explore
 popd > /dev/null
 

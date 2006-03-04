@@ -47,8 +47,6 @@ TIMEFORMAT="+%Y.%m%d.%H%S.%N"
 
 COMMAND_DEL="DEL"
 
-let list_only=0
-
 #########################################################################################
 
 if [ ! -e "$RECYCLE_BIN/$DFILE_LIST" ] ; then
@@ -59,15 +57,20 @@ fi
 echo "Cleaning recycle bin."
 
 let count=0
-exec < $RECYCLE_BIN/$DFILE_LIST
-while read instr orig_fname del_fname
+exec < "$RECYCLE_BIN/$DFILE_LIST"
+while read instr
 do
 	
 	# echo "$instr $orig_fname $del_fname" 
 	if [ "$instr" == "$COMMAND_DEL" ] ; then
+		read -r orig_fname
+		read -r del_fname
+		# echo "INSTR: $instr"
+		# echo "ORIG: $orig_fname"
+		# echo "DEL: $del_fname"
 		if [ -e "$del_fname" ] ; then
 			echo "Cleaning: $del_fname"
-			rm -rf $del_fname
+			rm -rf "$del_fname"
 			let count=count+1
 		else
 			echo "$del_fname no longer exists"
@@ -75,7 +78,7 @@ do
 	fi
 done
 exec <&-
-rm $RECYCLE_BIN/$DFILE_LIST
+rm "$RECYCLE_BIN/$DFILE_LIST"
 
 echo "Removed $count item(s). Cleaning completed."
 
