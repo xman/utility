@@ -122,7 +122,7 @@ explore()
 				rm -rf "$TMP_DIR"
 			fi
 		else
-			if [ "$OPTIONS_SUPPRESS_WARNING" -eq 0 ] ; then
+			if [ "$OPTION_SUPPRESS_WARNING" -eq 0 ] ; then
 				echo "WARNING: Ignore $file"
 			fi
 		fi
