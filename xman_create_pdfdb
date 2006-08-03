@@ -52,6 +52,9 @@ TIMEFORMAT="+%Y.%m%d.%H%S.%N"
 MIN_IMAGE_SIZE=1000
 IMAGE_NAME_PREFIX="image-"
 
+# Options
+OPTION_SUPPRESS_WARNING=1
+
 #########################################################################################
 
 explore()
@@ -75,7 +78,9 @@ explore()
 		elif [ "${file##*.}" == "pdf" ] ; then
 			csum=`$SHA1SUM "$PWD/$file" | $AWK '{ print $1 }'`
 			if [ -e "$PDFDB_DIR/$csum" ] ; then
-				echo "WARNING: $file exists in database."
+				if [ "$OPTION_SUPPRESS_WARNING" -eq 0 ] ; then
+					echo "WARNING: $file exists in database."
+				fi
 			else
 				echo "Processing: $file"
 				mkdir -p "$PDFDB_DIR/$csum"
