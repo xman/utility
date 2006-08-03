@@ -69,12 +69,17 @@ explore()
 	local TMP_DIR=""
 	ls -1 | while read -r file 
 	do
+		# Recursively explore if we found a directory.
 		if [ -d "$file" ] ; then
 			echo "Entering $file"
 			pushd "$file" > /dev/null
 			explore
 			echo "Leaving $file"
 			popd > /dev/null
+		# Process it if we found a pdf file.
+		# We may use "file" command to check if this a pdf file.
+		# If we simply check the extension, we should use case insensitive.
+		# ******** TO DO: Use case insensitive or use other ways to determine a pdf file.
 		elif [ "${file##*.}" == "pdf" ] ; then
 			csum=`$SHA1SUM "$PWD/$file" | $AWK '{ print $1 }'`
 			if [ -e "$PDFDB_DIR/$csum" ] ; then
@@ -117,11 +122,14 @@ explore()
 				rm -rf "$TMP_DIR"
 			fi
 		else
-			echo "Ignore: $file"
+			if [ "$OPTIONS_SUPPRESS_WARNING" -eq 0 ] ; then
+				echo "WARNING: Ignore $file"
+			fi
 		fi
 	done
-}
+} # end of explore()
 
+# Start of main program
 if [ -z "$1" ] ; then
 	echo "usage: xman_create_pdfdb <PATH>"
 	exit 0
