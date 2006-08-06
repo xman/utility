@@ -43,6 +43,7 @@ DIFF="diff --brief"
 SHA1SUM="sha1sum"
 PDFTOTEXT="pdftotext"
 PDFIMAGES="pdfimages -j"
+LOWERCASE_FILTER="xman_tolower_filter"
 
 PDFDB_DIR="$HOME/.pdfdb"
 TMP_DIR_PREFIX="/tmp/createpdfdb"
@@ -78,9 +79,8 @@ explore()
 			popd > /dev/null
 		# Process it if we found a pdf file.
 		# We may use "file" command to check if this a pdf file.
-		# If we simply check the extension, we should use case insensitive.
-		# ******** TO DO: Use case insensitive or use other ways to determine a pdf file.
-		elif [ "${file##*.}" == "pdf" ] ; then
+		# Currently we merely check the file extension (case insensitive).
+		elif [ "`echo ${file##*.} | $LOWERCASE_FILTER`" == "pdf" ] ; then
 			csum=`$SHA1SUM "$PWD/$file" | $AWK '{ print $1 }'`
 			if [ -e "$PDFDB_DIR/$csum" ] ; then
 				if [ "$OPTION_SUPPRESS_WARNING" -eq 0 ] ; then
