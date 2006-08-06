@@ -21,3 +21,74 @@
 #
 # The GNU General Public License is contained in the file COPYING.
 #
+
+#!/bin/bash
+
+# Author: xman
+# Email : cshinyee@gmail.com
+# Date  : 06 Aug 2006
+
+# Syntax: xman_uppercase FILE ...
+
+# Given: A list of files/directories.
+# Output: The list of files/directories are converted to uppercase.
+
+# Known problems/limitations:
+
+newline=$'\n'
+FILTER="xman_toupper_filter"
+FILTERNAME="Uppercase"
+
+#########################################################################################
+
+if [ -z "$1" ] ; then
+	echo "usage: xman_uppercase FILE ..."
+	exit 0
+fi
+
+# Apply filter $FILTER to each of the files.
+until [ -z "$1" ]
+do
+	# Current file
+	f="$1"
+
+	if [ ! -e "$f" ] ; then
+		echo "Cannot find: $f"
+		shift
+		continue
+	fi
+
+	d=`dirname "$f"`
+	# $d doesnt start with "/"? 
+	if [ "${d:0:1}" != "/" ] ; then
+		# $d is a relative path.
+		# Prepend $d with current directory to obtain the absolute path.
+		d="$PWD/$d"
+	fi
+	b=`basename "$f"`
+	if [ "$d" == "$b" ] ; then
+		echo "No parent directory?: $f"
+		shift 
+		continue
+	fi
+
+	dfname=`echo $b | $FILTER`
+	if [ ! -e "$d/$dfname" ] ; then
+		echo "$FILTERNAME: $f"
+		mv $f "$d/$dfname"
+	elif [ "$b" == "$dfname" ] ; then
+		shift
+		continue
+	else	
+		echo "$dfname exists. Skip."
+		shift
+		continue
+	fi
+
+	shift
+done
+
+exit 0
+
+#eof
+

@@ -21,3 +21,30 @@
 #
 # The GNU General Public License is contained in the file COPYING.
 #
+
+#!/bin/bash
+
+# Author: xman
+# Email : cshinyee@gmail.com
+# Date  : 06 Aug 2006
+
+# Syntax: xman_tolower_filter
+
+# Description: Read from stdin, and pass through lowercase filter.
+
+# Given: Text in stdin.
+# Output: Lowercase text from stdin.
+
+GAWK="gawk"
+
+#################################################################
+
+$GAWK	'{			\
+		s=tolower($0) ;	\
+		print s		\
+	 }'
+
+exit 0
+
+# eof
+
