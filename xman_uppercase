@@ -75,7 +75,7 @@ do
 	dfname=`echo $b | $FILTER`
 	if [ ! -e "$d/$dfname" ] ; then
 		echo "$FILTERNAME: $f"
-		mv $f "$d/$dfname"
+		mv "$f" "$d/$dfname"
 	elif [ "$b" == "$dfname" ] ; then
 		shift
 		continue
