@@ -35,14 +35,9 @@
 # Given: Text in stdin.
 # Output: Lowercase text from stdin.
 
-GAWK="gawk"
-
 #################################################################
 
-$GAWK	'{			\
-		s=toupper($0) ;	\
-		print s		\
-	 }'
+tr 'a-z' 'A-Z'
 
 exit 0
 
