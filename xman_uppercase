@@ -72,7 +72,7 @@ do
 		continue
 	fi
 
-	dfname=`echo $b | $FILTER`
+	dfname=`echo $b | eval $FILTER`
 	if [ ! -e "$d/$dfname" ] ; then
 		echo "$FILTERNAME: $f"
 		mv "$f" "$d/$dfname"

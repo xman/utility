@@ -1,4 +1,4 @@
-# This file xman_lowercase is part of xman utility.
+# This file xman_trfile is part of xman utility.
 #
 # Copyright (c) 2006 Chung Shin Yee <cshinyee@gmail.com>
 #
@@ -24,27 +24,33 @@
 
 #!/bin/bash
 
-# Author: xman
-# Email : cshinyee@gmail.com
-# Date  : 06 Aug 2006
+# Date  : 05 Sep 2006
 
-# Syntax: xman_lowercase FILE ...
+# Syntax: xman_trfile SET1 SET2 FILE ...
 
-# Given: A list of files/directories.
-# Output: The list of files/directories are converted to lowercase.
+# Given: Character SET1, character SET2, and a list of files/directories.
+# Output: The list of files/directories which its characters in SET1 are translated into characters in SET2.
 
 # Known problems/limitations:
 
+# Example: 
+# Translate all space in file names into '_'.
+# > xman_trfile ' ' '_' file1 file\ 2
+# The file "file\ 2" becomes "file_2".
+
 newline=$'\n'
-FILTER="xman_tolower_filter"
-FILTERNAME="Lowercase"
+FILTER="xman_tr_filter '$1' '$2'"
+FILTERNAME="Translate"
 
 #########################################################################################
 
-if [ -z "$1" ] ; then
-	echo "usage: xman_lowercase FILE ..."
+if [ $# -le 2 ] ; then
+	echo "usage: xman_trfile SET1 SET2 FILE ..."
 	exit 0
 fi
+
+# Shift away SET1 and SET2 from argument list.
+shift 2
 
 # Apply filter $FILTER to each of the files.
 until [ -z "$1" ]
