@@ -1,4 +1,4 @@
-# This file xman_dos2unix is part of xman utility.
+# This file xman_unix2dos is part of xman utility.
 #
 # Copyright (c) 2007 Chung Shin Yee <cshinyee@gmail.com>
 #
@@ -26,16 +26,16 @@
 
 # Date  : 22 April 2007
 
-# Syntax: xman_dos2unix <FILE> ...
+# Syntax: xman_unix2dos <FILE> ...
 
-# Description: Apply dos2unix to all given text files recursively.
+# Description: Apply unix2dos to all given text files recursively.
 
 # Given: Files or folders.
-# Output: All text files including those in subfolders (recursively) will have all CRLF being removed.
+# Output: All text files including those in subfolders (recursively) will have CRLF at end of lines.
 
 FILE="file"
 GREP="grep -i"
-DOS2UNIX="dos2unix"
+UNIX2DOS="unix2dos"
 
 #########################################################################################
 
@@ -52,16 +52,16 @@ explore()
 			echo "Leaving $file"
 			popd > /dev/null
 		# Process it if we found a text file.
-		elif [ "`${FILE} ${file} | ${GREP} text`" != "" ]] ; then
+		elif [ "`${FILE} ${file} | ${GREP} text`" != "" ] ; then
 			# echo "Processing: $file"
-			$DOS2UNIX "${file}"
+			$UNIX2DOS "${file}"
 		fi
 	done
 } # end of explore()
 
 # Start of main program
 if [ -z "$1" ] ; then
-	echo "usage: xman_dos2unix <FILE> ..."
+	echo "usage: xman_unix2dos <FILE> ..."
 	exit 0
 fi
 
@@ -82,7 +82,7 @@ for file in $@ ; do
 		echo "Leaving $file"
 		popd
 	elif [ "`${FILE} ${file} | ${GREP} text`" != "" ] ; then
-		$DOS2UNIX "$file"	
+		$UNIX2DOS "$file"	
 	fi
 done
 
