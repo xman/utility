@@ -52,7 +52,7 @@ explore()
 			echo "Leaving $file"
 			popd > /dev/null
 		# Process it if we found a text file.
-		elif [ "`${FILE} ${file} | ${GREP} text`" != "" ]] ; then
+		elif [ "`${FILE} \"${file}\" | ${GREP} text`" != "" ] ; then
 			# echo "Processing: $file"
 			$DOS2UNIX "${file}"
 		fi
@@ -72,19 +72,24 @@ if [ ! -e "$dir" ] ; then
 	exit 0
 fi
 
+OLDIFS=$IFS
+IFS=$'\n'
 for file in $@ ; do
 	# FIXME: I should have put these into a subroutine to reduce code duplications in explore().
 	# However, I'm not familiar with subroutines in BASH yet.
+	IFS=$OLDIFS
 	if [ -d "$file" ] ; then
 		echo "Entering $file"
 		pushd "$file" > /dev/null
 		explore
 		echo "Leaving $file"
 		popd
-	elif [ "`${FILE} ${file} | ${GREP} text`" != "" ] ; then
+	elif [ "`${FILE} \"${file}\" | ${GREP} text`" != "" ] ; then
 		$DOS2UNIX "$file"	
 	fi
+	IFS=$'\n'
 done
+IFS=$OLDIFS
 
 exit 0
 
