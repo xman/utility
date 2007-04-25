@@ -72,12 +72,9 @@ if [ ! -e "$dir" ] ; then
 	exit 0
 fi
 
-OLDIFS=$IFS
-IFS=$'\n'
-for file in $@ ; do
+for file in "$@" ; do
 	# FIXME: I should have put these into a subroutine to reduce code duplications in explore().
 	# However, I'm not familiar with subroutines in BASH yet.
-	IFS=$OLDIFS
 	if [ -d "$file" ] ; then
 		echo "Entering $file"
 		pushd "$file" > /dev/null
@@ -87,9 +84,7 @@ for file in $@ ; do
 	elif [ "`${FILE} \"${file}\" | ${GREP} text`" != "" ] ; then
 		$UNIX2DOS "$file"	
 	fi
-	IFS=$'\n'
 done
-IFS=$OLDIFS
 
 exit 0
 
