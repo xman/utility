@@ -72,6 +72,9 @@ do
 			echo "Cleaning: $del_fname"
 			rm -rf "$del_fname"
 			let count=count+1
+
+			# Remove the $DIR_DELETED if it becomes empty.
+			rmdir --ignore-fail-on-non-empty ${del_fname%\/*}
 		else
 			echo "$del_fname no longer exists"
 		fi
