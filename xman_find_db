@@ -1,0 +1,77 @@
+# This file xman_find_db is part of xman utility.
+#
+# Copyright (c) 2006-2007 Chung Shin Yee <cshinyee@gmail.com>
+#
+#       http://myxman.org
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+# USA.
+#
+# The GNU General Public License is contained in the file COPYING.
+#
+
+#!/bin/bash
+
+# Date  : 31 Jul 2007
+
+# Syntax: xman_find_db FILE ...
+
+# Description: Create a PDF database.
+
+# Given: A list of files.
+# Output: Report files that match with entries in PDF database.
+
+# Known problems/limitations:
+
+AWK="gawk"
+SHA1SUM="sha1sum"
+
+PDFDB_DIR="$HOME/.pdfdb"
+
+# Options
+OPTION_SUPPRESS_WARNING=1
+
+#########################################################################################
+
+# Start of main program
+if [ -z "$1" ] ; then
+	echo "usage: xman_find_db FILE ..."
+	exit 0
+fi
+
+until [ -z "$1" ]
+do
+	# File to be matched with database.
+	f="$1"
+
+	if [ ! -e "$f" ] ; then
+		echo "Cannot find: $f"
+		shift
+		continue
+	fi
+
+	s=`$SHA1SUM "$f" | $AWK '{ print $1 }'`
+
+	if [ -e "$PDFDB_DIR/$s" ] ; then
+		echo "$f	$s"
+	fi
+
+	shift
+done
+
+exit 0
+
+#eof
+
