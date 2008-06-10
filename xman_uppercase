@@ -36,7 +36,7 @@
 # Known problems/limitations:
 
 newline=$'\n'
-FILTER="xman_toupper_filter"
+FILTER="tr 'a-z' 'A-Z'"
 FILTERNAME="Uppercase"
 
 #########################################################################################
