@@ -39,7 +39,7 @@
 # The file "file\ 2" becomes "file_2".
 
 newline=$'\n'
-FILTER="xman_tr_filter '$1' '$2'"
+FILTER="tr '$1' '$2'"
 FILTERNAME="Translate"
 
 #########################################################################################
