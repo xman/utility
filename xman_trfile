@@ -37,9 +37,17 @@
 # Translate all space in file names into '_'.
 # > xman_trfile ' ' '_' file1 file\ 2
 # The file "file\ 2" becomes "file_2".
+# > xman_trfile ' ' '' file1 file\ 2
+# The file "file\ 2" becomes file2.
 
 newline=$'\n'
-FILTER="tr '$1' '$2'"
+if [ "$2" != '' ]; then
+	# Filter to translate SET1 to SET2.
+	FILTER="tr '$1' '$2'"
+else
+	# Filter to delete SET1.
+	FILTER="tr -d '$1'"
+fi
 FILTERNAME="Translate"
 
 #########################################################################################
@@ -79,13 +87,17 @@ do
 	fi
 
 	dfname=`echo $b | eval $FILTER`
-	if [ ! -e "$d/$dfname" ] ; then
+	if [ "$dfname" != "" -a ! -e "$d/$dfname" ] ; then
 		echo "$FILTERNAME: $f"
 		mv "$f" "$d/$dfname"
 	elif [ "$b" == "$dfname" ] ; then
 		shift
 		continue
-	else	
+	elif [ "$dfname" == "" ] ; then
+		echo "Cannot translate $f to empty name."
+		shift
+		continue
+	else
 		echo "$dfname exists. Skip."
 		shift
 		continue
