@@ -1,0 +1,47 @@
+#!/usr/bin/ruby -w
+
+VERSIONDB = "#{ENV["HOME"]}/.versiondb"
+
+def highlight(s)
+    return "\e[34m" + s + "\e[0m"
+end
+
+File.open(VERSIONDB, "r") do |f|
+    require 'tempfile'
+
+    while name = f.gets
+        name.chomp!
+        url = f.gets.chomp!
+        last = f.gets.chomp!
+        start_pattern = f.gets.chomp!
+        end_pattern = f.gets.chomp!
+        f.gets
+
+        printf("Checking #{name} ==> ")
+        tmpfile = Tempfile.new("download_url")
+        `wget -q -O #{tmpfile.path} '#{url}'`
+        content = ""
+        File.open(tmpfile.path, "r") do |f2|
+            content = f2.gets(nil)
+        end
+
+        #puts "Start = #{start_pattern}"
+        #puts "End = #{end_pattern}"
+
+        m = content.index(start_pattern)
+        m2 = content.index(end_pattern, m + start_pattern.length)
+
+        #puts m, m2
+        #puts content[m...m2]
+
+        s = content[m+start_pattern.length...m2].strip
+        s.gsub!(/<([^>])+>/, '')
+
+        printf("#{s} ")
+        if s == last then
+            printf("no update\n")
+        elsif
+            printf(highlight("new version available\n"))
+        end
+    end
+end
