@@ -1,0 +1,60 @@
+# This file xman_utility is part of xman utility.
+#
+# Copyright (c) 2009 Chung Shin Yee <cshinyee@gmail.com>
+#
+#	http://myxman.org
+#   http://www.github.com/xman
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+# USA.
+#
+# The GNU General Public License is contained in the file COPYING.
+#
+
+# Author: xman
+# Email : cshinyee@gmail.com
+# Date  : 12 Mar 2009
+
+# Provide functions for general use.
+
+#########################################################################################
+
+# Pre-append an item to a list with separator.
+# Usage:
+#     $ pre_append LD_LIBRARY_PATH "/usr/local/lib64" ":"
+#     $ pre_append PATH "/usr/local/bin"
+#
+# Parameter: list*, item, separator=":"
+pre_append()
+{
+    local listref=1
+    local item="$2"
+    local separator="$3"
+
+    if [ -z $separator ]; then
+        separator=":"
+    fi
+
+    local listval=`eval 'expr "$'${!listref}'" '`
+    if [ -z $listval ]; then
+        eval ${!listref}="$item"
+    else
+        eval ${!listref}="$item$separator$listval"
+    fi
+}
+
+
+#eof
+
