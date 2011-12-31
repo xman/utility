@@ -41,7 +41,7 @@ RECYCLE_BIN="$HOME/.recycle_bin"
 DIR_DELETED=".deleted"
 DFILE_LIST="deleted_file.txt"
 
-TIMEFORMAT="+%Y.%m%d.%H%S.%N"
+TIMEFORMAT="+%Y.%m%d.%H%M%S.%N"
 
 newline=$'\n'
 
